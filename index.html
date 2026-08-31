@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GE 213 Portal | Term 481</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+    .nav-btn.active {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      box-shadow: 0 4px 14px 0 rgba(2, 132, 199, 0.39);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+
+  <!-- Top Dynamic Alert Bar -->
+  <aside aria-label="تنبيهات عاجلة" class="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white text-xs py-2 px-4 shadow-inner">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="bg-black/20 px-2 py-0.5 rounded font-bold" id="auto-alert-tag">جاري التحقق...</span>
+        <span id="auto-alert-text">جاري تحميل المتطلبات القادمة...</span>
+      </div>
+      <span class="font-bold text-amber-200" id="auto-alert-week">الأسبوع الحالي</span>
+    </div>
+  </aside>
+
+  <!-- Main Navigation Header -->
+  <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-black text-lg">
+          213
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-sky-400">GE 213 · Term 481</span>
+            <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">Qassim University</span>
+          </div>
+          <h1 class="text-lg font-black text-white">مقدمة في التصميم الهندسي 2</h1>
+        </div>
+      </div>
+
+      <nav aria-label="أقسام البوابة الرئيسية" class="flex flex-wrap items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+        <button onclick="navigate('schedule')" id="btn-schedule" class="nav-btn active px-3.5 py-1.5 rounded-lg text-xs font-bold transition">📅 خطة الكلاسات</button>
+        <button onclick="navigate('calculator')" id="btn-calculator" class="nav-btn text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition">🧮 حاسبة القريد والـ Defects</button>
+        <button onclick="navigate('assignments')" id="btn-assignments" class="nav-btn text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition">📑 جدول التسليمات</button>
+        <button onclick="navigate('rubrics')" id="btn-rubrics" class="nav-btn text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition">🥪 معايير الساندوتش والملف</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
+
+    <!-- View 1: Schedule -->
+    <section id="view-schedule" class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <div>
+          <h2 class="text-base font-bold text-white">خطة المحاضرات والمهام الأسبوعية</h2>
+          <p class="text-xs text-slate-400">مواعيد جلسات الأحد (Class 1) والأربعاء (Class 2)</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="week-filter" class="text-xs text-slate-400 font-semibold">تصفية حسب الأسبوع:</label>
+          <select id="week-filter" onchange="filterWeeks()" class="bg-slate-950 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
+            <option value="all">جميع الأسابيع (1 - 15)</option>
+            <option value="1">الأسبوع 1</option>
+            <option value="2">الأسبوع 2</option>
+            <option value="3">الأسبوع 3</option>
+            <option value="4">الأسبوع 4</option>
+            <option value="5">الأسبوع 5</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="schedule-grid"></div>
+    </section>
+
+    <!-- View 2: Calculator -->
+    <section id="view-calculator" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+          <div>
+            <h2 class="text-base font-bold text-white">حاسبة درجات المقرر الرسمية (GE 213 Calculator)</h2>
+            <p class="text-xs text-slate-400 mt-1">تعتمد الدرجات النهائية على تحقيق الـ Exceeds وتجنب الـ Defects التراكمية.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <label for="c-exceeds" class="block text-xs font-bold text-sky-400 mb-1">عدد أعمال Exceeds (E) المحققة:</label>
+              <input type="number" id="c-exceeds" min="0" max="9" value="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white font-bold focus:ring-1 focus:ring-sky-500 outline-none" oninput="runCalc()">
+              <span class="text-[10px] text-slate-500 block mt-1">يلزمك 3 أعمال E على الأقل للـ A+</span>
+            </div>
+
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <label for="c-lapses" class="block text-xs font-bold text-amber-400 mb-1">زلات الانضباط (Self Regulation Lapses):</label>
+              <input type="number" step="0.5" id="c-lapses" min="0" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white font-bold focus:ring-1 focus:ring-sky-500 outline-none" oninput="runCalc()">
+              <span class="text-[10px] text-slate-500 block mt-1">التأخير &gt;10د = 1 Lapse | التأخير &lt;10د = 0.5 Lapse</span>
+            </div>
+
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <label for="c-ni" class="block text-xs font-bold text-rose-400 mb-1">واجبات بنتيجة Needs Improvement (NI) نهائية:</label>
+              <input type="number" id="c-ni" min="0" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white font-bold focus:ring-1 focus:ring-sky-500 outline-none" oninput="runCalc()">
+              <span class="text-[10px] text-slate-500 block mt-1">كل تسليم NI لم يُصحح يولد عيوباً</span>
+            </div>
+
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <label for="c-nce" class="block text-xs font-bold text-red-500 mb-1">واجبات No Submittal (NS) / No Credible (NCE):</label>
+              <input type="number" id="c-nce" min="0" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white font-bold focus:ring-1 focus:ring-sky-500 outline-none" oninput="runCalc()">
+              <span class="text-[10px] text-slate-500 block mt-1">الواجبات غير المسلمة نهائياً</span>
+            </div>
+
+            <div class="sm:col-span-2 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <label for="c-bonus" class="block text-xs font-bold text-emerald-400 mb-1">نقاط البونص التشجيعية (Motivation Bonuses):</label>
+              <input type="number" id="c-bonus" min="0" max="5" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white font-bold focus:ring-1 focus:ring-sky-500 outline-none" oninput="runCalc()">
+              <span class="text-[10px] text-slate-500 block mt-1">كل بونص يحذف زلة انضباط واحدة فوراً (الحد الأقصى 5 بونصات)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-sky-950 border border-sky-900/50 rounded-2xl p-6 flex flex-col justify-between shadow-2xl">
+          <div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-sky-400 tracking-wider">التقدير المستحق</span>
+              <span class="text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded">FDM System</span>
+            </div>
+            <div class="text-7xl font-black text-white mt-4 text-center tracking-tight drop-shadow-md" id="calc-grade">A+</div>
+            <p class="text-xs text-center text-slate-300 mt-3 font-semibold leading-relaxed" id="calc-desc">مستوفٍ لشروط العلامة الكاملة.</p>
+          </div>
+
+          <div class="space-y-2.5 pt-6 border-t border-slate-800 text-xs">
+            <div class="flex justify-between text-slate-400">
+              <span>إجمالي العيوب (Defects):</span>
+              <span class="font-bold text-rose-400" id="calc-total-defects">0 Defect</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>الزلات الصافية (Net Lapses):</span>
+              <span class="font-bold text-amber-300" id="calc-net-lapses">0</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>حالة الملف (Portfolio):</span>
+              <span class="font-bold text-emerald-400">Active</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- View 3: Assignments List -->
+    <section id="view-assignments" class="hidden space-y-4">
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <h2 class="text-base font-bold text-white">جدول التسليمات والواجبات الرسمية (Assignments Schedule)</h2>
+        <p class="text-xs text-slate-400 mt-0.5">مواعيد التسليم وإعادة التسليم لجميع الأعمال خلال الترم</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-right">
+            <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="p-3.5">الرقم</th>
+                <th class="p-3.5">الواجب / المشروع</th>
+                <th class="p-3.5">النوع</th>
+                <th class="p-3.5 text-rose-400">موعد التسليم (Due)</th>
+                <th class="p-3.5">الإرجاع</th>
+                <th class="p-3.5 text-amber-400">إعادة التسليم</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 text-slate-200">
+              <tr class="hover:bg-slate-800/30 transition"><td class="p-3.5">1</td><td class="p-3.5 font-bold text-white">Excel Assignment</td><td class="p-3.5"><span class="bg-sky-500/10 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded text-[11px]">Team</span></td><td class="p-3.5 font-bold text-rose-400">Class 4-1</td><td class="p-3.5">5-1</td><td class="p-3.5 text-amber-300">Class 6-1</td></tr>
+              <tr class="hover:bg-slate-800/30 transition"><td class="p-3.5">2</td><td class="p-3.5 font-bold text-white">Chapter 1 Assignment</td><td class="p-3.5"><span class="bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded text-[11px]">Individual</span></td><td class="p-3.5 font-bold text-rose-400">Class 6-1</td><td class="p-3.5">7-1</td><td class="p-3.5 text-amber-300">Class 8-1</td></tr>
+              <tr class="hover:bg-slate-800/30 transition"><td class="p-3.5">3</td><td class="p-3.5 font-bold text-white">Chapter 4 In-Class</td><td class="p-3.5"><span class="bg-sky-500/10 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded text-[11px]">Team</span></td><td class="p-3.5 font-bold text-rose-400">Class 9-1</td><td class="p-3.5">-</td><td class="p-3.5 text-slate-500">-</td></tr>
+              <tr class="hover:bg-slate-800/30 transition"><td class="p-3.5">4</td><td class="p-3.5 font-bold text-white">Individual In-Class</td><td class="p-3.5"><span class="bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded text-[11px]">Individual</span></td><td class="p-3.5 font-bold text-rose-400">Class 10-2</td><td class="p-3.5">No return</td><td class="p-3.5 text-slate-500">No resubmit</td></tr>
+              <tr class="hover:bg-slate-800/30 transition"><td class="p-3.5">5</td><td class="p-3.5 font-bold text-white">Chapter 7 In-Class</td><td class="p-3.5"><span class="bg-sky-500/10 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded text-[11px]">Team</span></td><td class="p-3.5 font-bold text-rose-400">Class 11-1</td><td class="p-3.5">-</td><td class="p-3.5 text-slate-500">-</td></tr>
+              <tr class="hover:bg-slate-800/30 transition"><td class="p-3.5">6</td><td class="p-3.5 font-bold text-white">Defect Removal</td><td class="p-3.5"><span class="bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded text-[11px]">Individual</span></td><td class="p-3.5 font-bold text-rose-400">Class 12-1</td><td class="p-3.5">-</td><td class="p-3.5 text-slate-500">-</td></tr>
+              <tr class="hover:bg-slate-800/30 transition"><td class="p-3.5">7</td><td class="p-3.5 font-bold text-white">Course Project Final Report</td><td class="p-3.5"><span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px]">Final Project</span></td><td class="p-3.5 font-bold text-rose-400">Class 15-1</td><td class="p-3.5">-</td><td class="p-3.5 text-slate-500">-</td></tr>
+              <tr class="hover:bg-slate-800/30 transition"><td class="p-3.5">8</td><td class="p-3.5 font-bold text-white">Course Portfolio Final</td><td class="p-3.5"><span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px]">Team Portfolio</span></td><td class="p-3.5 font-bold text-rose-400">Class 15-1</td><td class="p-3.5">-</td><td class="p-3.5 text-slate-500">-</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 4: Rubrics -->
+    <section id="view-rubrics" class="hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center gap-2 text-sky-400 font-bold text-sm">
+            <span>🥪</span> هيكل تقارير الساندوتش (Sandwich Report Format)
+          </div>
+          <p class="text-xs text-slate-400">الترتيب الإلزامي لجميع التقارير الهندسية المسلمة بالمقرر:</p>
+          <div class="space-y-2.5 text-xs text-slate-300">
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <strong class="text-white block mb-1">1. Cover Page</strong>
+              عنوان المشكلة، رقم الفريق، أسماء الطلاب وأرقامهم، اسم المقرر ورقمه، اسم المنسق والشعبة.
+            </div>
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <strong class="text-white block mb-1">2. Introduction</strong>
+              شرح سياق المشكلة والهدف من الحل وما تم إنجازه وخارطة طريق التقرير.
+            </div>
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <strong class="text-white block mb-1">3. Main Body</strong>
+              الفرضيات (Assumptions)، النماذج، الحسابات، والجداول (لا تكتب عبارة Main Body كعنوان).
+            </div>
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <strong class="text-white block mb-1">4. Conclusions &amp; References</strong>
+              الدروس المستفادة والتحقق من صحة النتائج، ثم قائمة المراجع بالترقيم [1].
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center gap-2 text-amber-400 font-bold text-sm">
+            <span>📁</span> فواصل ملف الإنجاز (Portfolio Dividers)
+          </div>
+          <p class="text-xs text-slate-400">الأقسام العشرة التي يجب فصلها بالملف المجلد المشترك:</p>
+          <div class="grid grid-cols-2 gap-2 text-xs text-slate-300">
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">1. Team Norms</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">2. Assessment Checklists</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">3. Textbook Comments</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">4. Team Opinion (+s &amp; Δs)</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">5. Team Assignments</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">6. Individual Assignments</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">7. Course Project</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">8. Meeting Minutes</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">9. Documents &amp; Surveys</div>
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">10. Conclusions</div>
+          </div>
+          <div class="p-3 bg-sky-950/30 border border-sky-800/40 rounded-xl text-[11px] text-sky-300">
+            يُرفق في نهاية الملف جيب خاص بقرص CD/DVD أو فلاش ميموري للمشروع النهائي والعرض التقديمي.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-slate-950 border-t border-slate-850 py-4 text-center text-xs text-slate-600 border-slate-900">
+    GE 213 Tracker · كلية الهندسة - جامعة القصيم · Semester 481
+  </footer>
+
+  <script>
+    const termSchedule = [
+      {
+        w: 1,
+        c1: { t: "Introduction to GE-213 & Creating Teams", due: "None", tasks: "Read FDM, Print Team Norms Step 1" },
+        c2: { t: "Working in Teams & Team Norms", due: "Bring FDM, Bring Team Norms Step 1 (20 Cards)", tasks: "Finish Team Norms (Step 3), Print Excel Handout (1)" }
+      },
+      {
+        w: 2,
+        c1: { t: "Report out on FDM & Intro to Excel Part 1", due: "Bring Excel Handout (1) to class", tasks: "Print and read Excel Assignment checklist" },
+        c2: { t: "Intro to Excel - Continue", due: "Bring Excel Handout (1) & Checklist", tasks: "Print and read Sign-off Form" }
+      },
+      {
+        w: 3,
+        c1: { t: "Excel Assignment - Team Work", due: "Bring Sign-off Form & Excel Checklist", tasks: "Purchase textbook: How to Model It (HTMI)" },
+        c2: { t: "Chapter 1: Introducing Models", due: "Bring textbook (HTMI) to class", tasks: "Read Chapter 1, Complete Excel Assignment" }
+      },
+      {
+        w: 4,
+        c1: { t: "Chapter 1: Variables & Sensitivity", due: "Submit Excel Assignment + Checklist", tasks: "Read Chapter 1 Assignment expectations" },
+        c2: { t: "National Day Holiday 🇸🇦", due: "Holiday", tasks: "Prepare Chapter 1 Individual Assignment" }
+      },
+      {
+        w: 5,
+        c1: { t: "Entry Survey & Chapter 1 Individual Assignment", due: "Bring HTMI, Entry Survey, Ch1 Checklist", tasks: "Print and go through Sample Report" },
+        c2: { t: "Excel Feedback & Sample Report", due: "Bring Sample Report", tasks: "Print Excel Handout Part (II)" }
+      },
+      {
+        w: 6,
+        c1: { t: "Intro to Excel Part (II)", due: "Bring Excel Handout II, Submit Ch1 Assignment", tasks: "Complete and practice Excel II tasks" },
+        c2: { t: "Review / Midterm Preparation", due: "In-class tasks", tasks: "Prepare for Midterm Exam" }
+      },
+      {
+        w: 7,
+        c1: { t: "Midterm Exam 📝", due: "Midterm Exam Session", tasks: "Read Chapter 4 (HTMI)" },
+        c2: { t: "Chapter 4: The Hot & Thirsty Executive", due: "Bring textbook (HTMI)", tasks: "Read and work tasks on Chapter 4" }
+      },
+      {
+        w: 8,
+        c1: { t: "Chapter 4: Lumping & Calibration", due: "Bring HTMI, Bring Portfolio + Checklist-1", tasks: "Prepare for Chapter 4 Team Assignment" },
+        c2: { t: "Chapter 4: Goal Seek", due: "Bring HTMI, Bring Portfolio + Checklist-1", tasks: "Finalize Chapter 4 Assignment tasks" }
+      },
+      {
+        w: 9,
+        c1: { t: "Team In-Class Assignment (Chapter 4)", due: "In-class Team Work", tasks: "Read Chapter 7 (HTMI)" },
+        c2: { t: "Chapter 7: The Student's Dilemma", due: "Bring HTMI, Resubmit Chapter 1 Assignment", tasks: "Read Chapter 7, Print Project Part-1" }
+      },
+      {
+        w: 10,
+        c1: { t: "Chapter 7: Optimization & Resources", due: "Bring HTMI to class", tasks: "Prepare for Individual In-Class Assignment" },
+        c2: { t: "Individual In-Class Assignment & Project Part I", due: "In-class Assignment", tasks: "Bring Portfolio with Checklist-2" }
+      },
+      {
+        w: 11,
+        c1: { t: "Portfolio 2nd Assessment (Checklist-2)", due: "Course Project Part I Discussion", tasks: "Prepare for Chapter 7 Team Assignment" },
+        c2: { t: "Chapter 7 Team In-Class Assignment", due: "Ch7 Team In-class", tasks: "Finalize Problem Definition of Project Part I" }
+      },
+      {
+        w: 12,
+        c1: { t: "Defect Removal Assignment", due: "Defect Removal In-Class", tasks: "Print Project Part II expectations" },
+        c2: { t: "Midterm Exam 2 📝", due: "Exam Session", tasks: "Satisfy Project Part II expectations" }
+      },
+      {
+        w: 13,
+        c1: { t: "Midterm Exam Session", due: "Midterm Exam", tasks: "Work on Course Project Final Report" },
+        c2: { t: "Autumn Holiday 🍂", due: "Holiday", tasks: "Project work" }
+      },
+      {
+        w: 14,
+        c1: { t: "Course Project - Part II Interim Assessment", due: "Project Part II Expectations", tasks: "Complete Project Report, Portfolio, Presentation" },
+        c2: { t: "Exit Survey & Course Evaluation", due: "Surveys Submission", tasks: "Burn CD/DVD and organize Portfolio" }
+      },
+      {
+        w: 15,
+        c1: { t: "Final Submission & Project Celebration 🎉", due: "Submit Project Report, Portfolio, Presentation", tasks: "Oral Presentation Celebration!" },
+        c2: { t: "Course Wrap-up", due: "Final Wrap-up", tasks: "Congratulations!" }
+      }
+    ];
+
+    function updateDynamicAlert() {
+      const startDate = new Date('2026-08-30T00:00:00');
+      const now = new Date();
+      const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+      
+      let currentWeekNum = Math.floor(diffDays / 7) + 1;
+      if (currentWeekNum < 1) currentWeekNum = 1;
+      if (currentWeekNum > 15) currentWeekNum = 15;
+
+      const dayOfWeek = now.getDay();
+      const targetWeekData = termSchedule.find(w => w.w === currentWeekNum) || termSchedule[0];
+
+      const alertTag = document.getElementById('auto-alert-tag');
+      const alertText = document.getElementById('auto-alert-text');
+      const alertWeek = document.getElementById('auto-alert-week');
+
+      alertWeek.innerText = `الأسبوع ${currentWeekNum}`;
+
+      if (dayOfWeek <= 3 && dayOfWeek >= 0) {
+        alertTag.innerText = `تنبيه كلاس الأربعاء (Class ${currentWeekNum}-2)`;
+        alertText.innerText = `المطلوب: ${targetWeekData.c2.due}`;
+      } else {
+        const nextWeekNum = Math.min(15, currentWeekNum + 1);
+        const nextWeekData = termSchedule.find(w => w.w === nextWeekNum) || targetWeekData;
+        alertTag.innerText = `تنبيه كلاس الأحد (Class ${nextWeekNum}-1)`;
+        alertText.innerText = `المطلوب: ${nextWeekData.c1.due}`;
+      }
+    }
+
+    function renderScheduleCards(items) {
+      const container = document.getElementById('schedule-grid');
+      container.innerHTML = items.map(w => `
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-slate-700 transition">
+          <div class="bg-slate-950 px-4 py-2.5 border-b border-slate-800 flex justify-between items-center">
+            <span class="font-bold text-xs text-white">الأسبوع ${w.w}</span>
+            <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">Week #${w.w}</span>
+          </div>
+          <div class="p-4 space-y-4">
+            <div class="border-r-2 border-emerald-500 pr-3">
+              <div class="flex items-center gap-2">
+                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold px-1.5 py-0.5 rounded">الأحد (Class ${w.w}-1)</span>
+                <span class="font-bold text-xs text-slate-100">${w.c1.t}</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-1"><strong class="text-rose-400 font-semibold">مطلوب جلبه/تسليمه:</strong> ${w.c1.due}</div>
+              <div class="text-[11px] text-slate-400"><strong class="text-sky-400 font-semibold">المطلوب بعد الكلاس:</strong> ${w.c1.tasks}</div>
+            </div>
+
+            <div class="border-r-2 border-sky-500 pr-3">
+              <div class="flex items-center gap-2">
+                <span class="bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[10px] font-bold px-1.5 py-0.5 rounded">الأربعاء (Class ${w.w}-2)</span>
+                <span class="font-bold text-xs text-slate-100">${w.c2.t}</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-1"><strong class="text-rose-400 font-semibold">مطلوب جلبه/تسليمه:</strong> ${w.c2.due}</div>
+              <div class="text-[11px] text-slate-400"><strong class="text-sky-400 font-semibold">المطلوب بعد الكلاس:</strong> ${w.c2.tasks}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterWeeks() {
+      const val = document.getElementById('week-filter').value;
+      if (val === 'all') {
+        renderScheduleCards(termSchedule);
+      } else {
+        const filtered = termSchedule.filter(x => x.w === parseInt(val));
+        renderScheduleCards(filtered);
+      }
+    }
+
+    function navigate(tabId) {
+      ['schedule', 'calculator', 'assignments', 'rubrics'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        document.getElementById(`btn-${t}`).classList.remove('active');
+        document.getElementById(`btn-${t}`).classList.add('text-slate-400');
+      });
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      document.getElementById(`btn-${tabId}`).classList.add('active');
+      document.getElementById(`btn-${tabId}`).classList.remove('text-slate-400');
+    }
+
+    function runCalc() {
+      const e = parseInt(document.getElementById('c-exceeds').value) || 0;
+      const lapses = parseFloat(document.getElementById('c-lapses').value) || 0;
+      const ni = parseInt(document.getElementById('c-ni').value) || 0;
+      const nce = parseInt(document.getElementById('c-nce').value) || 0;
+      const bonus = parseInt(document.getElementById('c-bonus').value) || 0;
+
+      const netLapses = Math.max(0, lapses - bonus);
+      document.getElementById('calc-net-lapses').innerText = netLapses;
+
+      let lapseDefects = 0;
+      if (netLapses >= 3 && netLapses <= 4) lapseDefects = 0.5;
+      else if (netLapses >= 4.5 && netLapses <= 5.5) lapseDefects = 1;
+      else if (netLapses >= 6 && netLapses <= 7) lapseDefects = 2;
+      else if (netLapses >= 7.5 && netLapses <= 8) lapseDefects = 3;
+      else if (netLapses >= 8.5 && netLapses <= 9.5) lapseDefects = 4;
+      else if (netLapses > 9.5) lapseDefects = 5;
+
+      let nceDefects = 0;
+      if (nce === 1) nceDefects = 1;
+      else if (nce === 2) nceDefects = 2;
+      else if (nce === 3) nceDefects = 3;
+      else if (nce >= 4) nceDefects = 5;
+
+      let niDefects = 0;
+      if (ni === 1) niDefects = 0.5;
+      else if (ni === 2) niDefects = 1;
+      else if (ni === 3) niDefects = 1.5;
+      else if (ni === 4) niDefects = 2;
+      else if (ni === 5) niDefects = 3;
+      else if (ni >= 6) niDefects = 5;
+
+      const totalDefects = lapseDefects + nceDefects + niDefects;
+      document.getElementById('calc-total-defects').innerText = `${totalDefects} Defect`;
+
+      let letter = "F";
+      let desc = "";
+
+      if (totalDefects === 0) {
+        if (e >= 3) letter = "A+";
+        else if (e === 2) letter = "A";
+        else if (e === 1) letter = "B+";
+        else letter = "B";
+      } else if (totalDefects === 0.5) {
+        if (e >= 3) letter = "A";
+        else if (e === 2) letter = "B+";
+        else if (e === 1) letter = "B";
+        else letter = "C+";
+      } else if (totalDefects === 1) {
+        if (e >= 3) letter = "B+";
+        else if (e === 2) letter = "B";
+        else if (e === 1) letter = "C+";
+        else letter = "C";
+      } else if (totalDefects === 1.5) {
+        if (e >= 3) letter = "B";
+        else if (e === 2) letter = "C+";
+        else if (e === 1) letter = "C";
+        else letter = "D+";
+      } else if (totalDefects === 2) {
+        if (e >= 3) letter = "C+";
+        else if (e === 2) letter = "C";
+        else if (e === 1) letter = "D+";
+        else letter = "D";
+      } else if (totalDefects === 2.5) {
+        if (e >= 3) letter = "C";
+        else if (e === 2) letter = "D+";
+        else if (e === 1) letter = "D";
+        else letter = "F";
+      } else if (totalDefects === 3) {
+        if (e >= 3) letter = "D+";
+        else letter = "D";
+      } else {
+        letter = "F";
+      }
+
+      document.getElementById('calc-grade').innerText = letter;
+
+      if (letter === "A+") desc = "أداء استثنائي كامل! مستوفٍ لشروط التميز وبدون عيوب.";
+      else if (letter.startsWith("A") || letter.startsWith("B")) desc = "أداء ممتاز، احرص على حصد الـ Exceeds وتجنب زلات الانضباط لرفع التقدير.";
+      else desc = "تنبيه: تراكم العيوب يقلل من التقدير النهائي بشكل كبير.";
+
+      document.getElementById('calc-desc').innerText = desc;
+    }
+
+    renderScheduleCards(termSchedule);
+    runCalc();
+    updateDynamicAlert();
+  </script>
+</body>
+</html>
